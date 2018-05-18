@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@serverless-chrome/lambda": "^1.0.0-30"
+  },
+  "devDependencies": {
+    "chrome-launcher": "^0.9.0"
+  }
+}

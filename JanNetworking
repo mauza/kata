@@ -1,0 +1,76 @@
+hey my name is on the left. Cool <---
+
+cusadmin
+highspeed
+
+<---- advantages
+
+Anyways here's what you need to do
+
+Find out netgear admin/pass
+find out atran admin/pass
+turn of DHCP on comcast and atran
+and then make sure this is your setup
+
+INTERNET -> Comcast -> Netgear -> Atran
+			(phone?)   Wireless   Ethernet
+
+If you wanted them separate, there's ways, but not with 3 DHCP
+
+Yes, Atran goes into netgear and comcast goes into netgear
+Okay
+so here's the problem if you need to explain it, besides the obvious :)
+
+Then you set static on the pi
+or just tell the DHCP server in netgear to use static IP
+I do that, it's easier and I can adjust it faster (remotely)
+
+Then people can go there. Last thing. Hostnames. In your static config, you should set a host name so you can type
+192.168.0.100 or pi-project
+It will take you to either
+since .coms and .nets aren't real on private networks. Technically you could, but it's not what people think or easy?
+
+NO - I don't know Atran
+never hear of it
+could be some shady chinese company for all I know
+You could have a far better network for under $100
+It's easily managed and has amazing throughput. But that's besides the point. Oh right. You never let switches do DHCP.
+second hand? it is a startup so I get that
+but don't cheap out on network stuff
+
+yea sure
+Okay so
+best practice is to have router or domain do DHCP
+Your comcast business class router is a modem/router
+Since you don't have a domain, I'd go with netgear
+Also update it while you are in there, it plugs security holes
+but ya you might need to do something else
+your router could be set static at 192.168.1.1 which we know it is but since comcast is in router mode issuing DHCP, your netgear could decide to pull a 10.1.10.2 address and then you'd have a problem, so you can fix that by turning it off.
+
+I wish i could show you my setup so it'd make sense
+but it's basically what i mapped above except my access points (yes i have multiple) are connected to POE switch via Ethernet and get DHCP from domain
+This allows me to track them and do DPI (deep packet inspection) and see what they are doing. Lots of facebook and youtube.
+
+Domain controller
+usually
+company.local
+so you have computers called this with host names
+casey.company.local -> 192.168.1.16
+server.company.local -> 192.168.1.1
+but you don't use 192 in business, you would use an instance of 10.x
+Yes, 172, 168, and 10 are the private IP sectors
+10.1.1.x is 253 addresses
+10.1.x.x is like thousands
+10.x is millions
+you control that by subnets
+255.255.255.0 means 255 hosts
+255.255.0.0 means 255 * 255
+255.255.255.132 means like 100 i don't remember math but you get my point
+
+So I'm on 10.1.10.x / 255.255.0.0
+because I have like 200 devices on my network at one time (busiest time of year, but that's what you budget for)
+
+wow I wrote a novel. Too bad I didn't have to do a thesis for my degree. But i do have to design a 200 user, 4 building network and phone system.
+I'l like, LOL ez, but my degree is inflated with saudi arabia students and their english
+not so good
+phone....
