@@ -1,32 +1,11 @@
-# import itertools
+count = 1
 
-# currency = [1,2,5,10,20,50,100,200]
-
-# # combs = itertools.combinations_with_replacement(currency, 200)
-
-# # result = [a for a in combs if sum(a) == 200]
-
-# combinations = []
-
-# current_list = []
-# for c1 in currency:
-#     for c2 in currency:
-#         while sum(current_list) < 200:
-#             current_list.append(c1)
-
-import time
-import random
-
-currency = [1,2,5,10,20,50,100,200]
-start = time.time()
-
-results = set()
-
-while time.time() - start < 6000:
-    tmp = []
-    while sum(tmp) < 200:
-        tmp.append(random.choice(currency))
-    if sum(tmp) == 200:
-        results.add(''.join([str(t) for t in sorted(tmp)]))
-
-print(len(results))
+for b in range (101):
+    for c in range(41):
+        for d in range(21):
+            for e in range(11):
+                for f in range(5):
+                    for g in range(3):
+                        if (b*2 + c*5 + d*10 + e*20 + f*50 + g*100) <= 200:
+                            count += 1
+print(count)
