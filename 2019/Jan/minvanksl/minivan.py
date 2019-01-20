@@ -50,7 +50,7 @@ for listing in listings:
     recent = False
     if 'Min' in tos:
         minutes = int(tos.split()[0])
-        if minutes < 21:
+        if minutes < 32:
             recent = True
     if not recent:
         continue
