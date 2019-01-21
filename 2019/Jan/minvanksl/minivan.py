@@ -6,7 +6,7 @@ import smtplib
 from email.mime.text import MIMEText
 
 base_url = "https://www.ksl.com"
-url = "https://www.ksl.com/auto/search/index?yearFrom=2009&mileageTo=135000&priceTo=9500&sellerType%5B%5D=For+Sale+By+Owner&titleType%5B%5D=Clean+Title&body%5B%5D=Minivan"
+url = "https://www.ksl.com/auto/search/index?yearFrom=2009&mileageTo=140000&priceTo=10000&sellerType%5B%5D=For+Sale+By+Owner&titleType%5B%5D=Clean+Title&body%5B%5D=Minivan"
 
 def send_text(title, price, url):
     from config import sender, password
