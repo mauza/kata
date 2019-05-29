@@ -7,9 +7,9 @@ from utils import send_text
 
 send_to_list = ["8018217046@msg.fi.google.com"]
 zips = [84043, 84003, 84004, 84020, 84065, 84096]
-clev = 44102
+clev = 44116
 today = datetime.now()
-list_time_delta = timedelta(hours=1)
+list_time_delta = timedelta(hours=32)
 
 def get_property_in_zip(zip_code):
     initial_url = 'https://mapi-ng.rdc.moveaws.com/api/v1/properties?postal_code={}&client_id=rdc_mobile_native&limit=200'.format(zip_code)
@@ -48,7 +48,12 @@ def main():
                 send_text(property.get("rdc_web_url"), send_to_list)
 
 if __name__ == "__main__":
-    props = get_property_in_zip(clev)
-    for p in props:
-        if p.get('prop_type') == "multi_family":
-            print(p)
+    # props = get_property_in_zip(clev)
+    # for p in props:
+    #     if p.get('prop_type') == "multi_family":
+    #         print(p['property_id'])
+    #         property_info = get_property_info(p['property_id'])
+    #         print(property_info)
+    #         if property_info['properties'][0].get("mls") and property_info['properties'][0]['mls']['id'] in ["4324752", "9688725"]:
+    #             print(property_info)
+    main()
