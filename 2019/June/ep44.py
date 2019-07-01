@@ -1,3 +1,4 @@
+import math
 import multiprocessing as mp
 from concurrent.futures import ProcessPoolExecutor
 from itertools import combinations
@@ -6,7 +7,9 @@ def pent_num(n):
     return 0.5*n*(3*n-1)
 
 def is_pent_num(n):
-    x = 1
+    x = math.floor(math.sqrt(n*2/3))
+    if n == 1:
+        return True
     while True:
         pent_n = pent_num(x)
         if n == pent_n:
@@ -52,8 +55,10 @@ def main():
     print(min_dict)
 
 def test():
-    for p in gen_pent_pairs(10):
-        print(p)
+    print(is_pent_num(2))
+    # for p in gen_pent_pairs(10):
+    #     print(p)
+    #     print(is_pent_num(p[0]))
 
 if __name__ == "__main__":
     main()
