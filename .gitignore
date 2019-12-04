@@ -6,3 +6,4 @@ config.py
 RobinhoodShell
 **/data
 .direnv
+.idea
