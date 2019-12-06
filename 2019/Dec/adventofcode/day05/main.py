@@ -10,6 +10,7 @@ def file_as_list(filename):
 def handle_op_code(c):
     c = "00000" + str(c)
     p = [int(c[-2:]), int(c[-3]), int(c[-4]), int(c[-5])]
+    print(f'{p[0]} - {p[1]}{p[2]}{p[3]}')
     return p
 
 
@@ -17,6 +18,7 @@ def main():
     pos = 0
     t = file_as_list('input.txt')
     while pos < len(t):
+        print(t[pos:])
         r = handle_op_code(t[pos])
         if r[0] == 99:
             break
@@ -30,7 +32,11 @@ def main():
                 v2 = t[pos + 2]
             else:
                 v2 = t[t[pos + 2]]
-            t[t[pos+3]] = v1 + v2
+            if r[3] == 1:
+                v3 = t[pos+3]
+            else:
+                v3 = t[t[pos+3]]
+            t[v3] = v1 + v2
             pos += 4
             continue
         if opp_code == 2:
@@ -42,26 +48,44 @@ def main():
                 v2 = t[pos + 2]
             else:
                 v2 = t[t[pos + 2]]
-            t[t[pos+3]] = v1 * v2
+            if r[3] == 1:
+                v3 = t[pos+3]
+            else:
+                v3 = t[t[pos+3]]
+            t[v3] = v1 * v2
             pos += 4
             continue
         if opp_code == 3:
-            t[t[pos + 1]] = i
+            if r[1] == 1:
+                v1 = t[pos + 1]
+            else:
+                v1 = t[t[pos + 1]]
+            t[v1] = i
             pos += 2
             continue
         if opp_code == 4:
-            print(t[pos + 1])
+            if r[1] == 1:
+                v1 = t[pos + 1]
+            else:
+                v1 = t[t[pos + 1]]
+            print(f"output: {t[v1]}")
             pos += 2
             continue
         print(t)
         return
 
 
-def test():
+def test(a):
     t = file_as_list('input.txt')
-    print(f"{t[225]}  +  {t[6]}")
+    print(f"{t[int(a)]}")
 
 
 if __name__ == "__main__":
-    #test()
-    main()
+    try:
+        a = sys.argv[1]
+    except:
+        a = None
+    if a:
+        test(a)
+    else:
+        main()
