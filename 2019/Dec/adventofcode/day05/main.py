@@ -1,5 +1,7 @@
+import time
 import sys
-i = 1
+import os
+i = 8
 
 def file_as_list(filename):
     with open(filename, 'r') as f:
@@ -10,16 +12,19 @@ def file_as_list(filename):
 def handle_op_code(c):
     c = "00000" + str(c)
     p = [int(c[-2:]), int(c[-3]), int(c[-4]), int(c[-5])]
-    print(f'{p[0]} - {p[1]}{p[2]}{p[3]}')
+    #print(f'{p[0]} - {p[1]}{p[2]}{p[3]}')
     return p
 
 
 def main():
     pos = 0
-    t = file_as_list('input.txt')
+    #t = file_as_list('input.txt')
+    t = [int(s) for s in '3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99'.split(',')]
     while pos < len(t):
-        print(t[pos:])
         r = handle_op_code(t[pos])
+        time.sleep(2)
+        os.system('clear')
+        print(t)
         if r[0] == 99:
             break
         opp_code = r[0]
@@ -32,10 +37,7 @@ def main():
                 v2 = t[pos + 2]
             else:
                 v2 = t[t[pos + 2]]
-            if r[3] == 1:
-                v3 = t[pos+3]
-            else:
-                v3 = t[t[pos+3]]
+            v3 = t[pos+3]
             t[v3] = v1 + v2
             pos += 4
             continue
@@ -48,18 +50,12 @@ def main():
                 v2 = t[pos + 2]
             else:
                 v2 = t[t[pos + 2]]
-            if r[3] == 1:
-                v3 = t[pos+3]
-            else:
-                v3 = t[t[pos+3]]
+            v3 = t[pos+3]
             t[v3] = v1 * v2
             pos += 4
             continue
         if opp_code == 3:
-            if r[1] == 1:
-                v1 = t[pos + 1]
-            else:
-                v1 = t[t[pos + 1]]
+            v1 = t[pos + 1]
             t[v1] = i
             pos += 2
             continue
@@ -68,8 +64,66 @@ def main():
                 v1 = t[pos + 1]
             else:
                 v1 = t[t[pos + 1]]
-            print(f"output: {t[v1]}")
+            print(f"output: {v1}")
             pos += 2
+            continue
+        if opp_code == 5:
+            if r[1] == 1:
+                v1 = t[pos + 1]
+            else:
+                v1 = t[t[pos + 1]]
+            if r[2] == 1:
+                v2 = t[pos + 2]
+            else:
+                v2 = t[t[pos + 2]]
+            if v1 != 0:
+                pos = v2
+            else:
+                pos += 3
+            continue
+        if opp_code == 6:
+            if r[1] == 1:
+                v1 = t[pos + 1]
+            else:
+                v1 = t[t[pos + 1]]
+            if r[2] == 1:
+                v2 = t[pos + 2]
+            else:
+                v2 = t[t[pos + 2]]
+            if v1 == 0:
+                pos = v2
+            else:
+                pos += 3
+            continue
+        if opp_code == 7:
+            if r[1] == 1:
+                v1 = t[pos + 1]
+            else:
+                v1 = t[t[pos + 1]]
+            if r[2] == 1:
+                v2 = t[pos + 2]
+            else:
+                v2 = t[t[pos + 2]]
+            if v1 < v2:
+                t[pos+3] = 1
+            else:
+                t[pos+3] = 0
+            pos += 4
+            continue
+        if opp_code == 8:
+            if r[1] == 1:
+                v1 = t[pos + 1]
+            else:
+                v1 = t[t[pos + 1]]
+            if r[2] == 1:
+                v2 = t[pos + 2]
+            else:
+                v2 = t[t[pos + 2]]
+            if v1 == v2:
+                t[pos+3] = 1
+            else:
+                t[pos+3] = 0
+            pos += 4
             continue
         print(t)
         return
