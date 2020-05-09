@@ -6,6 +6,7 @@ authors = ["Casey Mau <casey-mau@pluralsight.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
+pandas = "0.25.1"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.4"

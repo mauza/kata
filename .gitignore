@@ -8,3 +8,4 @@ RobinhoodShell
 .direnv
 .idea
 *.pyc
+.env
