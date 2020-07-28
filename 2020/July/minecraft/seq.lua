@@ -13,51 +13,60 @@ local tries = 11
 local position = {x=0, y=0, z=0}
 local currOrient = orientation.positive_x
 
-function Down()
-    while not turtle.down() do
-        if turtle.detectDown() then
-            if not turtle.digDown() then
-                return false
+function Down(times)
+    times = times or 1
+    for i = 1, times, 1 do
+        while not turtle.down() do
+            if turtle.detectDown() then
+                if not turtle.digDown() then
+                    return false
+                end
+            elseif turtle.attackDown() then
+                while turtle.attackDown() do end
+            elseif turtle.getFuelLevel() == 0 then
+                add_fuel()
             end
-        elseif turtle.attackDown() then
-            while turtle.attackDown() do end
-        elseif turtle.getFuelLevel() == 0 then
-            add_fuel()
         end
+        position.y = position.y - 1
     end
-    position.y = position.y - 1
     return true
 end
 
-function Up()
-    while not turtle.up() do
-        if turtle.detectUp() then
-            if not turtle.digUp() then
-                return false
+function Up(times)
+    times = times or 1
+    for i = 1, times, 1 do
+        while not turtle.up() do
+            if turtle.detectUp() then
+                if not turtle.digUp() then
+                    return false
+                end
+            elseif turtle.attackUp() then
+                while turtle.attackUp() do end
+            elseif turtle.getFuelLevel() == 0 then
+                add_fuel()
             end
-        elseif turtle.attackUp() then
-            while turtle.attackUp() do end
-        elseif turtle.getFuelLevel() == 0 then
-            add_fuel()
         end
+        position.y = position.y + 1
     end
-    position.y = position.y + 1
     return true
 end
 
-function Forward()
-    while not turtle.forward() do
-        if turtle.detect() then
-            if not turtle.dig() then
-                return false
+function Forward(times)
+    times = times or 1
+    for i = 1, times, 1 do
+        while not turtle.forward() do
+            if turtle.detect() then
+                if not turtle.dig() then
+                    return false
+                end
+            elseif turtle.attack() then
+                while turtle.attack() do end
+            elseif turtle.getFuelLevel() == 0 then
+                add_fuel()
             end
-        elseif turtle.attack() then
-            while turtle.attack() do end
-        elseif turtle.getFuelLevel() == 0 then
-            add_fuel()
         end
+        calc_position()
     end
-    calc_position()
     return true
 end
 
@@ -71,6 +80,7 @@ function calc_position()
     elseif currOrient == orientation.negative_z then
         position.z = position.z - 1
     end
+    writeMessage(position.x .. ' - ' .. position.y .. ' - ' .. position.z)
 end
 
 function Back()
@@ -88,22 +98,24 @@ function turn_left(times)
         end
         if currOrient == 0 then
             currOrient = 3
+        else
+            currOrient = currOrient - 1
         end
-        currOrient = currOrient - 1
     end
 end
 
 function turn_right(times)
     times = times or 1
-    for i = 0, times, 1 do
+    for i = 1, times, 1 do
         if not turtle.turnRight() then
             add_fuel()
             turtle.turnRight()
         end
         if currOrient == 3 then
             currOrient = 0
+        else
+            currOrient = currOrient + 1
         end
-        currOrient = currOrient + 1
     end
 end
 
@@ -111,7 +123,7 @@ function set_orientation(desired_orient)
     orient_diff = currOrient - desired_orient
     if math.abs(orient_diff) == 2 then
         turn_right(2)
-    elseif orient_diff == -3 or orient_diff == -1 then
+    elseif orient_diff == -3 or orient_diff == 1 then
         turn_left()
     elseif orient_diff == -1 or orient_diff == 3 then
         turn_right()
@@ -208,40 +220,46 @@ function move_up_to_next_level()
 end
 
 function mine_one_level(width)
-    for i = 1, width do
+    for i = 1, width + 1 do
+        if i ~= 1 then
+            if position.x == 0 then
+                turn_left()
+                Forward()
+                compare_and_replace(direction.UP)
+                compare_and_replace(direction.DOWN)
+                turn_left()
+            else
+                turn_right()
+                Forward()
+                compare_and_replace(direction.UP)
+                compare_and_replace(direction.DOWN)
+                turn_right()
+            end
+        end
         for i = 1, width do
             Forward()
             compare_and_replace(direction.UP)
             compare_and_replace(direction.DOWN)
         end
-        if position.x == 0 then
-            turn_left()
-            Forward()
-            turn_left()
-        else
-            turn_right()
-            Forward()
-            turn_right()
-        end
     end
 end
 
 function back_to_initial_hole()
+    x_val = math.abs(position.x)
+    z_val = math.abs(position.z)
     if position.x < 0 then
         set_orientation(orientation.positive_x)
-    else
+        Forward(x_val)
+    elseif position.x > 0 then
         set_orientation(orientation.negative_x)
+        Forward(x_val)
     end
     if position.z < 0 then
         set_orientation(orientation.positive_z)
-    else
+        Forward(z_val)
+    elseif position.z > 0 then
         set_orientation(orientation.negative_z)
-    end
-    for i = 1, math.abs(position.x) do
-        Forward()
-    end
-    for i = 1, math.abs(position.z) do
-        Forward()
+        Forward(z_val)
     end
     set_orientation(orientation.positive_x)
 end
