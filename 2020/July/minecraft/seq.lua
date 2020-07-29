@@ -1,5 +1,4 @@
 
-
 -- ********************************************************************************** --
 -- Global Vars
 -- ********************************************************************************** --
@@ -14,80 +13,52 @@ local last_empty_slot = 15
 local position = {x=0, y=0, z=0}
 local currOrient = orientation.positive_x
 
-function Down(times)
+function Move(move_direction, times)
+    writeMessage("moving " .. move_direction)
+    local move = turtle.forward
+    local detect = turtle.detect
+    if move_direction == direction.UP then
+        move = turtle.up
+        detect = turtle.detectUp
+    elseif move_direction == direction.DOWN then
+        move = turtle.down
+        detect = turtle.detectDown
+    end
     times = times or 1
     for i = 1, times, 1 do
-        while not turtle.down() do
-            if turtle.detectDown() then
-                if not turtle.digDown() then
+        while not move() do
+            if detect() then
+                if not Dig(move_direction) then
                     return false
                 end
-            elseif turtle.attackDown() then
-                while turtle.attackDown() do end
+            elseif Attack(move_direction) then
+                while Attack(move_direction) do end
             elseif turtle.getFuelLevel() == 0 then
                 add_fuel()
             end
         end
-        position.y = position.y - 1
+        calc_position(move_direction)
     end
     return true
 end
 
-function Up(times)
-    times = times or 1
-    for i = 1, times, 1 do
-        while not turtle.up() do
-            if turtle.detectUp() then
-                if not turtle.digUp() then
-                    return false
-                end
-            elseif turtle.attackUp() then
-                while turtle.attackUp() do end
-            elseif turtle.getFuelLevel() == 0 then
-                add_fuel()
-            end
-        end
+function calc_position(move_direction)
+    if move_direction == direction.UP then
         position.y = position.y + 1
-    end
-    return true
-end
-
-function Forward(times)
-    times = times or 1
-    for i = 1, times, 1 do
-        while not turtle.forward() do
-            if turtle.detect() then
-                if not turtle.dig() then
-                    return false
-                end
-            elseif turtle.attack() then
-                while turtle.attack() do end
-            elseif turtle.getFuelLevel() == 0 then
-                add_fuel()
-            end
+    elseif move_direction == direction.DOWN then
+        position.y = position.y - 1
+    elseif move_direction == direction.FORWARD then
+        if currOrient == orientation.positive_x then
+            position.x = position.x + 1
+        elseif currOrient == orientation.negative_x then
+            position.x = position.x - 1
+        elseif currOrient == orientation.positive_z then
+            position.z = position.z + 1
+        elseif currOrient == orientation.negative_z then
+            position.z = position.z - 1
         end
-        calc_position()
-    end
-    return true
-end
-
-function calc_position()
-    if currOrient == orientation.positive_x then
-        position.x = position.x + 1
-    elseif currOrient == orientation.negative_x then
-        position.x = position.x - 1
-    elseif currOrient == orientation.positive_z then
-        position.z = position.z + 1
-    elseif currOrient == orientation.negative_z then
-        position.z = position.z - 1
     end
     writeMessage(position.x .. ' - ' .. position.y .. ' - ' .. position.z)
-end
-
-function Back()
-    turn_right(2)
-    tfd()
-    turn_right(2)
 end
 
 function turn_left(times)
@@ -132,12 +103,14 @@ function set_orientation(desired_orient)
 end
 
 function ensure_inventory_space()
-    if  turtle.getItemCount(last_empty_slot) > 0 then
+    writeMessage("ensuring inventory has room")
+    if turtle.getItemCount(last_empty_slot) > 0 then
         unload()
     end
 end
 
 function unload()
+    writeMessage("unloading inventory")
     local last_x = position.x
     local last_y = position.y
     local last_z = position.z
@@ -153,11 +126,12 @@ function unload()
 end
 
 function Dig(side)
-    result = false
+    writeMessage("digging")
+    local result = false
     ensure_inventory_space()
     if side == direction.UP then
         result = turtle.digUp()
-    elseif side == direction.Down then
+    elseif side == direction.DOWN then
         result = turtle.digDown()
     elseif side == direction.FORWARD then
         result = turtle.dig()
@@ -166,10 +140,11 @@ function Dig(side)
 end
 
 function Attack(side)
-    result = false
+    writeMessage("attacking")
+    local result = false
     if side == direction.UP then
         result = turtle.attackUp()
-    elseif side == direction.Down then
+    elseif side == direction.DOWN then
         result = turtle.attackDown()
     elseif side == direction.FORWARD then
         result = turtle.attack()
@@ -178,10 +153,11 @@ function Attack(side)
 end
 
 function Place(side)
-    result = false
+    writeMessage("placing")
+    local result = false
     if side == direction.UP then
         result = turtle.placeUp()
-    elseif side == direction.Down then
+    elseif side == direction.DOWN then
         result = turtle.placeDown()
     elseif side == direction.FORWARD then
         result = turtle.place()
@@ -189,24 +165,12 @@ function Place(side)
     return result
 end
 
-function place(side)
-    local dig = turtle.dig
-    local attack = turtle.attack
-    local place_item = turtle.place
+function ensure_place(side)
     turtle.select(replace_slot)
-    if side == direction.UP then
-        dig = turtle.digUp
-        attack = turtle.attackUp
-        place_item = turtle.placeUp
-    elseif side == direction.DOWN then
-        dig = turtle.digDown
-        attack = turtle.attackDown
-        place_item = turtle.placeDown
-    end
     local attempt = 0
-    while place_item() == false do
-        dig()
-        attack()
+    while not Place(side) do
+        Dig(side)
+        Attack(side)
         attempt = attempt + 1
         if attempt >= tries then
             return false
@@ -236,7 +200,7 @@ function compare_and_replace(side)
         compare_result = turtle.compare()
     end
     if compare_result == false then
-        place(side)
+        ensure_place(side)
     end
     set_orientation(starting_orient)
     turtle.select(ini_slot)
@@ -249,6 +213,7 @@ function add_fuel()
     if fuel_count > 1 then
         turtle.refuel(fuel_count - 1)
     end
+    turtle.select(ini_slot)
 end
 
 function writeMessage(message)
@@ -267,14 +232,12 @@ function file_read(file_name)
 end
 
 function dig_to_bedrock()
-    while Down() do
-
-    end
+    while Move(direction.DOWN, 1) do end
 end
 
 function move_up_to_next_level()
     for i = 1, 3 do
-        Up()
+        Move(direction.UP, 1)
     end
 end
 
@@ -283,20 +246,20 @@ function mine_one_level(width)
         if i ~= 1 then
             if position.x == 0 then
                 turn_left()
-                Forward()
+                Move(direction.FORWARD, 1)
                 compare_and_replace(direction.UP)
                 compare_and_replace(direction.DOWN)
                 turn_left()
             else
                 turn_right()
-                Forward()
+                Move(direction.FORWARD, 1)
                 compare_and_replace(direction.UP)
                 compare_and_replace(direction.DOWN)
                 turn_right()
             end
         end
         for i = 1, width do
-            Forward()
+            Move(direction.FORWARD, 1)
             compare_and_replace(direction.UP)
             compare_and_replace(direction.DOWN)
         end
@@ -304,32 +267,34 @@ function mine_one_level(width)
 end
 
 function go_to_position(x, y, z, desired_orient)
-    x_diff = x - position.x
-    y_diff = y - position.y
-    z_diff = z - position.z
+    x_diff = position.x - x
+    y_diff = position.y - y
+    z_diff = position.z - z
+    writeMessage("differences: " .. x_diff .. " " .. y_diff .. " " .. z_diff)
     if x_diff < 0 then
         set_orientation(orientation.positive_x)
-        Forward(math.abs(x_diff))
+        Move(direction.FORWARD, math.abs(x_diff))
     elseif x_diff > 0 then
         set_orientation(orientation.negative_x)
-        Forward(math.abs(x_diff))
+        Move(direction.FORWARD, math.abs(x_diff))
     end
     if z_diff < 0 then
         set_orientation(orientation.positive_z)
-        Forward(math.abs(z_diff))
+        Move(direction.FORWARD, math.abs(z_diff))
     elseif z_diff > 0 then
         set_orientation(orientation.negative_z)
-        Forward(math.abs(z_diff))
+        Move(direction.FORWARD, math.abs(z_diff))
     end
     if y_diff < 0 then
-        Down(math.abs(y_diff))
+        Move(direction.UP, math.abs(y_diff))
     elseif y_diff > 0 then
-        Up(math.abs(y_diff))
+        Move(direction.DOWN, math.abs(y_diff))
     end
     set_orientation(desired_orient)
 end
 
 function quarry(width)
+    writeMessage("Starting to mine")
     dig_to_bedrock()
     while position.y <= -4 do
         move_up_to_next_level()
@@ -347,4 +312,3 @@ local args = { ... }
 quarryWidth = tonumber(args[1])
 
 quarry(quarryWidth)
-
