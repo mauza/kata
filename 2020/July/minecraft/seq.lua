@@ -9,6 +9,7 @@ local compare_slot = 1
 local replace_slot = 2
 local fuel_slot = 16
 local tries = 11
+local last_empty_slot = 15
 
 local position = {x=0, y=0, z=0}
 local currOrient = orientation.positive_x
@@ -130,6 +131,64 @@ function set_orientation(desired_orient)
     end
 end
 
+function ensure_inventory_space()
+    if  turtle.getItemCount(last_empty_slot) > 0 then
+        unload()
+    end
+end
+
+function unload()
+    local last_x = position.x
+    local last_y = position.y
+    local last_z = position.z
+    local last_orient = currOrient
+    local last_selected_slot = turtle.getSelectedSlot()
+    go_to_position(0, 0, 0, orientation.negative_x)
+    for i = 3, last_empty_slot do
+        turtle.select(i)
+        turtle.drop()
+    end
+    turtle.select(last_selected_slot)
+    go_to_position(last_x, last_y, last_z, last_orient)
+end
+
+function Dig(side)
+    result = false
+    ensure_inventory_space()
+    if side == direction.UP then
+        result = turtle.digUp()
+    elseif side == direction.Down then
+        result = turtle.digDown()
+    elseif side == direction.FORWARD then
+        result = turtle.dig()
+    end
+    return result
+end
+
+function Attack(side)
+    result = false
+    if side == direction.UP then
+        result = turtle.attackUp()
+    elseif side == direction.Down then
+        result = turtle.attackDown()
+    elseif side == direction.FORWARD then
+        result = turtle.attack()
+    end
+    return result
+end
+
+function Place(side)
+    result = false
+    if side == direction.UP then
+        result = turtle.placeUp()
+    elseif side == direction.Down then
+        result = turtle.placeDown()
+    elseif side == direction.FORWARD then
+        result = turtle.place()
+    end
+    return result
+end
+
 function place(side)
     local dig = turtle.dig
     local attack = turtle.attack
@@ -244,31 +303,30 @@ function mine_one_level(width)
     end
 end
 
-function back_to_initial_hole()
-    x_val = math.abs(position.x)
-    z_val = math.abs(position.z)
-    if position.x < 0 then
+function go_to_position(x, y, z, desired_orient)
+    x_diff = x - position.x
+    y_diff = y - position.y
+    z_diff = z - position.z
+    if x_diff < 0 then
         set_orientation(orientation.positive_x)
-        Forward(x_val)
-    elseif position.x > 0 then
+        Forward(math.abs(x_diff))
+    elseif x_diff > 0 then
         set_orientation(orientation.negative_x)
-        Forward(x_val)
+        Forward(math.abs(x_diff))
     end
-    if position.z < 0 then
+    if z_diff < 0 then
         set_orientation(orientation.positive_z)
-        Forward(z_val)
-    elseif position.z > 0 then
+        Forward(math.abs(z_diff))
+    elseif z_diff > 0 then
         set_orientation(orientation.negative_z)
-        Forward(z_val)
+        Forward(math.abs(z_diff))
     end
-    set_orientation(orientation.positive_x)
-end
-
-function return_to_start()
-    back_to_initial_hole()
-    while position.y < 0 do
-        Up()
+    if y_diff < 0 then
+        Down(math.abs(y_diff))
+    elseif y_diff > 0 then
+        Up(math.abs(y_diff))
     end
+    set_orientation(desired_orient)
 end
 
 function quarry(width)
@@ -276,9 +334,9 @@ function quarry(width)
     while position.y <= -4 do
         move_up_to_next_level()
         mine_one_level(width)
-        back_to_initial_hole()
+        go_to_position(0, position.y, 0, orientation.positive_x)
     end
-    return_to_start()
+    go_to_position(0, 0, 0, orientation.positive_x)
 end
 
 -- ********************************************************************************** --
