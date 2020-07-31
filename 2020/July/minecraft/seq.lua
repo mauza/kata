@@ -116,13 +116,13 @@ function unload()
     local last_z = position.z
     local last_orient = currOrient
     local last_selected_slot = turtle.getSelectedSlot()
-    go_to_position(0, 0, 0, orientation.negative_x)
+    go_to_position(0, 0, 0, orientation.negative_x, {3,1,2})
     for i = 3, last_empty_slot do
         turtle.select(i)
         turtle.drop()
     end
     turtle.select(last_selected_slot)
-    go_to_position(last_x, last_y, last_z, last_orient)
+    go_to_position(last_x, last_y, last_z, last_orient, {2,1,3})
 end
 
 function Dig(side)
@@ -266,29 +266,35 @@ function mine_one_level(width)
     end
 end
 
-function go_to_position(x, y, z, desired_orient)
+function go_to_position(x, y, z, desired_orient, order)
     x_diff = position.x - x
     y_diff = position.y - y
     z_diff = position.z - z
-    writeMessage("differences: " .. x_diff .. " " .. y_diff .. " " .. z_diff)
-    if x_diff < 0 then
-        set_orientation(orientation.positive_x)
-        Move(direction.FORWARD, math.abs(x_diff))
-    elseif x_diff > 0 then
-        set_orientation(orientation.negative_x)
-        Move(direction.FORWARD, math.abs(x_diff))
-    end
-    if z_diff < 0 then
-        set_orientation(orientation.positive_z)
-        Move(direction.FORWARD, math.abs(z_diff))
-    elseif z_diff > 0 then
-        set_orientation(orientation.negative_z)
-        Move(direction.FORWARD, math.abs(z_diff))
-    end
-    if y_diff < 0 then
-        Move(direction.UP, math.abs(y_diff))
-    elseif y_diff > 0 then
-        Move(direction.DOWN, math.abs(y_diff))
+    x_y_z = {x_diff, y_diff, z_diff}
+    for i, index in ipairs(order) do
+        current_diff = x_y_z[index]
+        magnitude = math.abs(current_diff)
+        if current_diff < 0 then
+            if index == 1 then
+                set_orientation(orientation.positive_x)
+                Move(direction.FORWARD, magnitude)
+            elseif index == 3 then
+                set_orientation(orientation.positive_z)
+                Move(direction.FORWARD, magnitude)
+            elseif index == 2 then
+                Move(direction.UP, magnitude)
+            end
+        elseif current_diff > 0 then
+            if index == 1 then
+                set_orientation(orientation.negative_x)
+                Move(direction.FORWARD, magnitude)
+            elseif index == 3 then
+                set_orientation(orientation.negative_z)
+                Move(direction.FORWARD, magnitude)
+            elseif index == 2 then
+                Move(direction.DOWN, magnitude)
+            end
+        end
     end
     set_orientation(desired_orient)
 end
@@ -299,9 +305,9 @@ function quarry(width)
     while position.y <= -4 do
         move_up_to_next_level()
         mine_one_level(width)
-        go_to_position(0, position.y, 0, orientation.positive_x)
+        go_to_position(0, position.y, 0, orientation.positive_x, {3,1,2})
     end
-    go_to_position(0, 0, 0, orientation.positive_x)
+    go_to_position(0, 0, 0, orientation.positive_x, {3,1,2})
 end
 
 -- ********************************************************************************** --
