@@ -316,6 +316,7 @@ end
 function quarry(width, mined_level)
     if not mined_level then
         dig_to_bedrock()
+        file_write('mined_level', position.y)
         go_to_position(0, position.y + 3, 0, orientation.positive_x, {3,1,2})
     else
         go_to_position(0, mined_level + 3, 0, orientation.positive_x, {3,1,2})
@@ -326,6 +327,7 @@ function quarry(width, mined_level)
         go_to_position(0, position.y + 3, 0, orientation.positive_x, {3,1,2})
     end
     go_to_position(0, 0, 0, orientation.positive_x, {3,1,2})
+    unload()
     reset_files()
 end
 
