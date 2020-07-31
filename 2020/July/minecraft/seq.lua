@@ -6,15 +6,14 @@ direction = { FORWARD=0, RIGHT=1, BACK=2, LEFT=3, UP=4, DOWN=5 }
 orientation = { positive_x=0, positive_z=1, negative_x=2, negative_z=3}
 local compare_slot = 1
 local replace_slot = 2
-local fuel_slot = 16
+local fuel_slot = 3
+local last_empty_slot = 16
 local tries = 11
-local last_empty_slot = 15
 
 local position = {x=0, y=0, z=0}
 local currOrient = orientation.positive_x
 
 function Move(move_direction, times)
-    writeMessage("moving " .. move_direction)
     local move = turtle.forward
     local detect = turtle.detect
     if move_direction == direction.UP then
