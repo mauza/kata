@@ -305,6 +305,15 @@ function go_to_position(x, y, z, desired_orient, order)
     set_orientation(desired_orient)
 end
 
+function reset_files()
+    file_write('x', '')
+    file_write('y', '')
+    file_write('z', '')
+    file_write('orientation', '')
+    file_write('mined_level', '')
+    file_write('width', '')
+end
+
 function quarry(width, mined_level)
     if not mined_level then
         dig_to_bedrock()
@@ -318,6 +327,7 @@ function quarry(width, mined_level)
         go_to_position(0, position.y + 3, 0, orientation.positive_x, {3,1,2})
     end
     go_to_position(0, 0, 0, orientation.positive_x, {3,1,2})
+    reset_files()
 end
 
 -- ********************************************************************************** --
