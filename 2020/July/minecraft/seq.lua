@@ -45,17 +45,23 @@ end
 function calc_position(move_direction)
     if move_direction == direction.UP then
         position.y = position.y + 1
+        file_write('y', position.y)
     elseif move_direction == direction.DOWN then
         position.y = position.y - 1
+        file_write('y', position.y)
     elseif move_direction == direction.FORWARD then
         if currOrient == orientation.positive_x then
             position.x = position.x + 1
+            file_write('x', position.x)
         elseif currOrient == orientation.negative_x then
             position.x = position.x - 1
+            file_write('x', position.x)
         elseif currOrient == orientation.positive_z then
             position.z = position.z + 1
+            file_write('z', position.z)
         elseif currOrient == orientation.negative_z then
             position.z = position.z - 1
+            file_write('z', position.z)
         end
     end
     writeMessage(position.x .. ' - ' .. position.y .. ' - ' .. position.z)
@@ -73,6 +79,7 @@ function turn_left(times)
         else
             currOrient = currOrient - 1
         end
+        file_write('orientation', currOrient)
     end
 end
 
@@ -88,6 +95,7 @@ function turn_right(times)
         else
             currOrient = currOrient + 1
         end
+        file_write('orientation', currOrient)
     end
 end
 
@@ -227,19 +235,17 @@ function file_write(file_name, value)
 end
 
 function file_read(file_name)
-    local outputFile = fs.open(file_name, 'r')
-    return outputFile.readLine()
+    writeMessage("Reading " .. file_name)
+    local outputFile = io.open(file_name, 'r')
+    value = outputFile:read()
+    outputFile:close()
+    return value
 end
 
 function dig_to_bedrock()
     while Move(direction.DOWN, 1) do end
 end
 
-function move_up_to_next_level()
-    for i = 1, 3 do
-        Move(direction.UP, 1)
-    end
-end
 
 function mine_one_level(width)
     for i = 1, width + 1 do
@@ -299,13 +305,17 @@ function go_to_position(x, y, z, desired_orient, order)
     set_orientation(desired_orient)
 end
 
-function quarry(width)
-    writeMessage("Starting to mine")
-    dig_to_bedrock()
+function quarry(width, mined_level)
+    if not mined_level then
+        dig_to_bedrock()
+        go_to_position(0, position.y + 3, 0, orientation.positive_x, {3,1,2})
+    else
+        go_to_position(0, mined_level + 3, 0, orientation.positive_x, {3,1,2})
+    end
     while position.y <= -4 do
-        move_up_to_next_level()
         mine_one_level(width)
-        go_to_position(0, position.y, 0, orientation.positive_x, {3,1,2})
+        file_write('mined_level', position.y)
+        go_to_position(0, position.y + 3, 0, orientation.positive_x, {3,1,2})
     end
     go_to_position(0, 0, 0, orientation.positive_x, {3,1,2})
 end
@@ -315,6 +325,18 @@ end
 -- ********************************************************************************** --
 local args = { ... }
 
-quarryWidth = tonumber(args[1])
-
-quarry(quarryWidth)
+if #args == 0 then
+    position.x = tonumber(file_read('x'))
+    position.y = tonumber(file_read('y'))
+    position.z = tonumber(file_read('z'))
+    currOrient = tonumber(file_read('orientation'))
+    quarryWidth = tonumber(file_read('width'))
+    mined_level = tonumber(file_read('mined_level'))
+    quarry(quarryWidth, mined_level)
+elseif #args == 1 then
+    quarryWidth = tonumber(args[1])
+    file_write('width', quarryWidth)
+    quarry(quarryWidth)
+else
+    writeMessage("something is horribly wrong")
+end
