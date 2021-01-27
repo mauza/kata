@@ -9,3 +9,4 @@ RobinhoodShell
 .idea
 *.pyc
 .env
+backups
