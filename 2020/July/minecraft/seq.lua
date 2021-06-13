@@ -7,6 +7,7 @@ orientation = { positive_x=0, positive_z=1, negative_x=2, negative_z=3}
 local compare_slot = 1
 local replace_slot = 2
 local fuel_slot = 3
+local last_empty_slot = 16
 local tries = 11
 
 local position = {x=0, y=0, z=0}
@@ -115,15 +116,6 @@ function ensure_inventory_space()
     end
 end
 
-function not_in_table(table, value)
-    for i, v in ipairs(table) do
-        if v == value then
-            return true
-        end
-    end
-    return false
-end
-
 function unload()
     writeMessage("unloading inventory")
     local last_x = position.x
@@ -132,11 +124,9 @@ function unload()
     local last_orient = currOrient
     local last_selected_slot = turtle.getSelectedSlot()
     go_to_position(0, 0, 0, orientation.negative_x, {3,1,2})
-    for i = 1, 16 do
-        if not_in_table({compare_slot, replace_slot, fuel_slot}, i) then
-            turtle.select(i)
-            turtle.drop()
-        end
+    for i = 3, last_empty_slot do
+        turtle.select(i)
+        turtle.drop()
     end
     turtle.select(last_selected_slot)
     go_to_position(last_x, last_y, last_z, last_orient, {2,1,3})
@@ -365,3 +355,4 @@ elseif #args == 1 then
 else
     writeMessage("something is horribly wrong")
 end
+

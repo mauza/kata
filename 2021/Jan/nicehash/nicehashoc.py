@@ -47,6 +47,7 @@ def main(base_dir):
     save_config(device_file_loc, device_config)
 
 if __name__ == "__main__":
-    base_nh_dir = '/mnt/d'
+    # sudo mount -t drvfs [DRIVE LETTER]: /mnt/d
+    base_nh_dir = '/mnt/f'
     main(base_nh_dir)
     # print(get_config('gpus.config'))
