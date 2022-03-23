@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content=
+        "width=device-width, 
+        initial-scale=1.0" />
+  
+    <title>Digital Clock</title>
+  
+    <style>
+        body {
+            background: black;
+        }
+        #clock {
+            font-size: 50vw;
+            font-family: Verdana, sans-serif;
+            text-align: center;
+            color: white;
+        }
+    </style>
+</head>
+  
+<body>
+    <div id="clock">11:11</div>
+  
+    <script>
+        setInterval(showTime, 1000);
+        function showTime() {
+            let time = new Date();
+            let hour = time.getHours();
+            let min = time.getMinutes();
+
+            if (hour >= 7 & hour <= 19) {
+                document.body.style.backgroundColor = "turquoise";
+            } else {
+                document.body.style.backgroundColor = "black";
+            }
+            if (hour > 12) {
+                hour -= 12;
+            }
+            if (hour == 0) {
+                hr = 12;
+            }
+  
+            min = min < 10 ? "0" + min : min;
+  
+            let currentTime = hour + ":" + min;
+  
+            document.getElementById("clock")
+                .innerHTML = currentTime;
+        }
+  
+        showTime();
+    </script>
+</body>
+  
+</html>

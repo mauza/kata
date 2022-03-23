@@ -35,6 +35,14 @@ def configure_device_settings(config, settings):
                             power['tdp'] = value['power']
                             power['core_clocks'] = value['core']
                             power['memory_clocks'] = value['memory']
+                        elif power['mode'] == 'medium':
+                            power['tdp'] = str(int(int(value['power'])*1.05))
+                            power['core_clocks'] = str(int(int(value['core'])*0.9))
+                            power['memory_clocks'] = str(int(int(value['memory'])*0.95))
+                        elif power['mode'] == 'low':
+                            power['tdp'] = str(int(int(value['power'])*1.15))
+                            power['core_clocks'] = str(int(int(value['core'])*0.8))
+                            power['memory_clocks'] = str(int(int(value['memory'])*0.90))
 
 def main(base_dir):
     device_file_loc = os.path.join(base_dir, "nhm/configs/device_settings.json")
@@ -48,6 +56,6 @@ def main(base_dir):
 
 if __name__ == "__main__":
     # sudo mount -t drvfs [DRIVE LETTER]: /mnt/d
-    base_nh_dir = '/mnt/f'
+    base_nh_dir = '/run/media/mauza/NHOS'
     main(base_nh_dir)
     # print(get_config('gpus.config'))
